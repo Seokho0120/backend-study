@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Backend Study</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+    h1 { margin-bottom: 24px; }
+    h2 { margin: 24px 0 12px; font-size: 16px; }
+    input, textarea { width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 4px; }
+    button { padding: 8px 16px; background: #333; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button.danger { background: #e33; }
+    .card { border: 1px solid #eee; border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+    .card h3 { margin-bottom: 4px; }
+    .card p { color: #555; font-size: 14px; }
+    .card small { color: #aaa; font-size: 12px; }
+    #status { margin-bottom: 16px; padding: 10px; background: #f5f5f5; border-radius: 4px; font-size: 14px; }
+    .row { display: flex; gap: 8px; }
+    .row input { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <h1>게시판</h1>
+
+  <div id="status">로그인하지 않은 상태</div>
+
+  <!-- 로그인/회원가입 -->
+  <section id="auth-section">
+    <h2>로그인 / 회원가입</h2>
+    <div class="row">
+      <input id="email" type="email" placeholder="이메일" />
+      <input id="password" type="password" placeholder="비밀번호" />
+    </div>
+    <div style="margin-top: 8px; display: flex; gap: 8px;">
+      <button onclick="login()">로그인</button>
+      <button onclick="register()">회원가입</button>
+    </div>
+  </section>
+
+  <!-- 게시글 작성 (로그인 후 표시) -->
+  <section id="write-section" style="display: none;">
+    <h2>게시글 작성</h2>
+    <input id="title" placeholder="제목" />
+    <textarea id="content" placeholder="내용" rows="3"></textarea>
+    <button onclick="createPost()">작성</button>
+  </section>
+
+  <!-- 게시글 목록 -->
+  <section>
+    <h2>게시글 목록</h2>
+    <div id="posts"></div>
+  </section>
+
+  <script>
+    let token = null
+
+    // 공통 fetch 함수
+    async function api(method, path, body) {
+      const res = await fetch(path, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: body ? JSON.stringify(body) : undefined
+      })
+      return res.json()
+    }
+
+    async function register() {
+      const email = document.getElementById('email').value
+      const password = document.getElementById('password').value
+      const data = await api('POST', '/auth/register', { email, password })
+      alert(data.message ?? '회원가입 완료!')
+    }
+
+    async function login() {
+      const email = document.getElementById('email').value
+      const password = document.getElementById('password').value
+      const data = await api('POST', '/auth/login', { email, password })
+
+      if (data.token) {
+        token = data.token
+        document.getElementById('status').textContent = `로그인 중: ${email}`
+        document.getElementById('auth-section').style.display = 'none'
+        document.getElementById('write-section').style.display = 'block'
+        loadPosts()
+      } else {
+        alert(data.message)
+      }
+    }
+
+    async function createPost() {
+      const title = document.getElementById('title').value
+      const content = document.getElementById('content').value
+      await api('POST', '/posts', { title, content })
+      document.getElementById('title').value = ''
+      document.getElementById('content').value = ''
+      loadPosts()
+    }
+
+    async function deletePost(id) {
+      await api('DELETE', `/posts/${id}`)
+      loadPosts()
+    }
+
+    async function loadPosts() {
+      const posts = await api('GET', '/posts')
+      const container = document.getElementById('posts')
+      container.innerHTML = posts.map(post => `
+        <div class="card">
+          <h3>${post.title}</h3>
+          <p>${post.content}</p>
+          <small>${post.created_at}</small>
+          ${token ? `<button class="danger" style="margin-top: 8px" onclick="deletePost(${post.id})">삭제</button>` : ''}
+        </div>
+      `).join('')
+    }
+
+    // 페이지 로드 시 게시글 목록 불러오기
+    loadPosts()
+  </script>
+</body>
+</html>
