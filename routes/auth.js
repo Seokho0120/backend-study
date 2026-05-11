@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const db = require('../db')
 
-const JWT_SECRET = 'my-secret-key' // 실제 서비스에선 환경변수로 관리
+const JWT_SECRET = process.env.JWT_SECRET
 
 // 회원가입 - POST /auth/register
 router.post('/register', async (req, res, next) => {
