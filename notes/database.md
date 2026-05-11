@@ -26,15 +26,80 @@
 
 ---
 
-## SQLite (커리큘럼 1에서 사용)
+## DB의 종류
 
-파일 하나가 DB 전체. 설치 없이 `.db` 파일만으로 동작. 학습/소규모용.
+DB도 목적에 따라 여러 종류가 있음. 크게 두 가지로 나뉨.
+
+### 관계형 DB (RDBMS) — 테이블 형태
+
+엑셀처럼 행/열로 데이터를 저장. 테이블끼리 관계를 맺을 수 있음.
 
 ```
-posts.db  ← 이 파일 하나가 DB
+┌──────────────────────────────────────────────────┐
+│  관계형 DB                                        │
+│                                                  │
+│  MySQL       → 가장 널리 쓰임, 오래된 프로젝트   │
+│  PostgreSQL  → 기능 풍부, 요즘 실무 표준         │
+│  SQLite      → 파일 기반, 설치 불필요, 학습용    │
+│  Oracle      → 대기업 레거시 시스템              │
+└──────────────────────────────────────────────────┘
 ```
 
-실제 서비스에서는 PostgreSQL 같은 서버형 DB를 씀 → 커리큘럼 2에서 전환.
+### 비관계형 DB (NoSQL) — 다양한 형태
+
+테이블이 아닌 다른 방식으로 저장. 구조가 유연함.
+
+```
+┌──────────────────────────────────────────────────┐
+│  비관계형 DB                                      │
+│                                                  │
+│  MongoDB   → JSON 형태로 저장. 구조가 자유로움   │
+│  Redis     → 메모리 기반, 초고속. 캐싱에 사용   │
+│  Firebase  → 구글 클라우드 DB. 실시간 동기화     │
+└──────────────────────────────────────────────────┘
+```
+
+### 우리가 PostgreSQL을 쓰는 이유
+
+```
+카카오톡 메시지   →  MongoDB   (메시지마다 구조가 다름, 유연함 필요)
+은행 거래 내역    →  Oracle    (정확성, 무결성 최우선)
+실시간 접속자 수  →  Redis     (빠른 읽기/쓰기 필요)
+일반 웹 서비스   →  PostgreSQL (균형 잡힌 성능, 요즘 표준)
+```
+
+게시글/댓글/유저처럼 구조가 명확하고 관계가 있는 데이터는 관계형 DB가 적합.
+그 중 PostgreSQL이 요즘 스타트업/일반 서비스에서 가장 많이 선택하는 조합.
+
+---
+
+## SQLite vs PostgreSQL
+
+```
+SQLite                              PostgreSQL
+┌─────────────────────┐             ┌─────────────────────┐
+│                     │             │                     │
+│   posts.db 파일     │             │ 항상 켜있는         │
+│   (파일 하나 = DB)  │             │ DB 전용 프로그램    │
+│                     │             │ (백그라운드 실행)   │
+└─────────────────────┘             └─────────────────────┘
+```
+
+카페 비유:
+```
+SQLite     = 냉장고 메모지에 주문 적기
+              → 혼자 볼 땐 괜찮지만 손님 100명이 동시에 쓰면 엉망
+
+PostgreSQL = 전문 주문관리 시스템
+              → 수천 명 동시 처리, 실제 카페에서 쓰는 수준
+```
+
+| | SQLite | PostgreSQL |
+|--|--------|------------|
+| 방식 | 파일 기반 | 서버형 (별도 프로세스) |
+| 용도 | 학습, 소규모 | 실제 서비스 |
+| 동시 접속 | 제한적 | 수천 명 동시 처리 |
+| 설치 | 불필요 | 필요 |
 
 ---
 
@@ -45,22 +110,11 @@ posts.db  ← 이 파일 하나가 DB
 영어 문장이랑 비슷하게 생겨서 읽으면 대충 무슨 뜻인지 느낌이 옴.
 
 ```
-서버가 DB한테 하는 말:
-
-"posts 테이블에서 전부 가져다줘"
-→ SELECT * FROM posts
-
-"id가 1인 게시글 가져다줘"
-→ SELECT * FROM posts WHERE id = 1
-
-"새 게시글 저장해줘"
-→ INSERT INTO posts (title, content) VALUES ('제목', '내용')
-
-"id가 1인 게시글 제목 바꿔줘"
-→ UPDATE posts SET title = '새 제목' WHERE id = 1
-
-"id가 1인 게시글 지워줘"
-→ DELETE FROM posts WHERE id = 1
+"posts 테이블에서 전부 가져다줘"  →  SELECT * FROM posts
+"id가 1인 게시글 가져다줘"        →  SELECT * FROM posts WHERE id = 1
+"새 게시글 저장해줘"               →  INSERT INTO posts (title, content) VALUES ('제목', '내용')
+"id가 1인 게시글 제목 바꿔줘"     →  UPDATE posts SET title = '새 제목' WHERE id = 1
+"id가 1인 게시글 지워줘"          →  DELETE FROM posts WHERE id = 1
 ```
 
 ---
@@ -69,13 +123,14 @@ posts.db  ← 이 파일 하나가 DB
 
 DB는 엑셀처럼 테이블(표) 형태로 데이터를 저장.
 
-```sql
-CREATE TABLE posts (
-  id         INTEGER PRIMARY KEY AUTOINCREMENT,  -- 자동 증가 고유 ID
-  title      TEXT    NOT NULL,
-  content    TEXT    NOT NULL,
-  created_at TEXT    DEFAULT (datetime('now', 'localtime'))
-)
+```
+users 테이블
+┌────┬───────────────────┬──────────────┐
+│ id │ email             │ password     │
+├────┼───────────────────┼──────────────┤
+│  1 │ kim@example.com   │ $2b$10$...   │
+│  2 │ lee@example.com   │ $2b$10$...   │
+└────┴───────────────────┴──────────────┘
 ```
 
 ---
@@ -92,26 +147,4 @@ id | title            id | post_id | content
                       3  |    2    | 잘봤어요
 ```
 
-```sql
-CREATE TABLE comments (
-  id      INTEGER PRIMARY KEY AUTOINCREMENT,
-  post_id INTEGER NOT NULL,
-  content TEXT    NOT NULL,
-  FOREIGN KEY (post_id) REFERENCES posts(id)  -- posts.id를 참조
-)
-```
-
 `FOREIGN KEY`를 설정하면 존재하지 않는 `post_id`를 넣으려 할 때 DB가 거부함.
-
----
-
-## SQLite vs PostgreSQL
-
-| | SQLite | PostgreSQL |
-|--|--------|------------|
-| 방식 | 파일 기반 | 서버형 (별도 프로세스) |
-| 용도 | 학습, 소규모 | 실제 서비스 |
-| 동시 접속 | 제한적 | 수천 명 동시 처리 |
-| 설치 | 불필요 | 필요 |
-
-→ 커리큘럼 2에서 PostgreSQL + Prisma로 전환 예정.
