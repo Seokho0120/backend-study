@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const db = require('../db')
+const prisma = require('../db')
 
 const JWT_SECRET = process.env.JWT_SECRET
 
@@ -12,14 +12,13 @@ router.post('/register', async (req, res, next) => {
     const { email, password } = req.body
     if (!email || !password) return res.status(400).json({ message: '이메일과 비밀번호를 입력해주세요.' })
 
-    const exists = db.prepare('SELECT * FROM users WHERE email = ?').get(email)
+    const exists = await prisma.user.findUnique({ where: { email } })
     if (exists) return res.status(409).json({ message: '이미 사용 중인 이메일입니다.' })
 
-    // 비밀번호 해시 (10 = 암호화 강도)
     const hashed = await bcrypt.hash(password, 10)
-    const result = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)').run(email, hashed)
+    const user = await prisma.user.create({ data: { email, password: hashed } })
 
-    res.status(201).json({ id: result.lastInsertRowid, email })
+    res.status(201).json({ id: user.id, email })
   } catch (err) {
     next(err)
   }
@@ -31,10 +30,9 @@ router.post('/login', async (req, res, next) => {
     const { email, password } = req.body
     if (!email || !password) return res.status(400).json({ message: '이메일과 비밀번호를 입력해주세요.' })
 
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email)
+    const user = await prisma.user.findUnique({ where: { email } })
     if (!user) return res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' })
 
-    // 입력한 비밀번호와 해시된 비밀번호 비교
     const match = await bcrypt.compare(password, user.password)
     if (!match) return res.status(401).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' })
 

@@ -12,9 +12,9 @@
 
 - [x] 커리큘럼 1 완료 — Node.js + Express + SQLite + JWT 인증 + 게시글/댓글 CRUD API
 - [ ] 커리큘럼 2 진행 중 — 실전 전환 (환경변수 → PostgreSQL → Prisma → TypeScript → 배포)
-  - [ ] 환경변수 (.env / dotenv)
-  - [ ] PostgreSQL로 DB 전환
-  - [ ] Prisma ORM 도입
+  - [x] 환경변수 (.env / dotenv)
+  - [x] PostgreSQL로 DB 전환
+  - [x] Prisma ORM 도입
   - [ ] TypeScript + ES Module 전환
   - [ ] Render 배포
 - [ ] 커리큘럼 3 — 기능 확장 (페이지네이션, 검색, 파일 업로드, 이메일, 권한)

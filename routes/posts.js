@@ -1,12 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const db = require('../db')
+const prisma = require('../db')
 const authMiddleware = require('../middleware/auth')
 
 // 목록 조회 - GET /posts
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
-    const posts = db.prepare('SELECT * FROM posts ORDER BY id DESC').all()
+    const posts = await prisma.post.findMany({ orderBy: { id: 'desc' } })
     res.json(posts)
   } catch (err) {
     next(err)
@@ -14,9 +14,9 @@ router.get('/', (req, res, next) => {
 })
 
 // 단건 조회 - GET /posts/:id
-router.get('/:id', (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   try {
-    const post = db.prepare('SELECT * FROM posts WHERE id = ?').get(req.params.id)
+    const post = await prisma.post.findUnique({ where: { id: parseInt(req.params.id) } })
     if (!post) return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' })
     res.json(post)
   } catch (err) {
@@ -25,32 +25,33 @@ router.get('/:id', (req, res, next) => {
 })
 
 // 작성 - POST /posts
-router.post('/', authMiddleware, (req, res, next) => {
+router.post('/', authMiddleware, async (req, res, next) => {
   try {
     const { title, content } = req.body
     if (!title || !content) return res.status(400).json({ message: '제목과 내용을 입력해주세요.' })
 
-    const result = db.prepare('INSERT INTO posts (title, content) VALUES (?, ?)').run(title, content)
-    const newPost = db.prepare('SELECT * FROM posts WHERE id = ?').get(result.lastInsertRowid)
-    res.status(201).json(newPost)
+    const post = await prisma.post.create({
+      data: { title, content, authorId: req.user.id }
+    })
+    res.status(201).json(post)
   } catch (err) {
     next(err)
   }
 })
 
 // 수정 - PATCH /posts/:id
-router.patch('/:id', authMiddleware, (req, res, next) => {
+router.patch('/:id', authMiddleware, async (req, res, next) => {
   try {
     const { title, content } = req.body
-    const post = db.prepare('SELECT * FROM posts WHERE id = ?').get(req.params.id)
+    const id = parseInt(req.params.id)
+
+    const post = await prisma.post.findUnique({ where: { id } })
     if (!post) return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' })
 
-    db.prepare('UPDATE posts SET title = ?, content = ? WHERE id = ?').run(
-      title ?? post.title,
-      content ?? post.content,
-      req.params.id
-    )
-    const updated = db.prepare('SELECT * FROM posts WHERE id = ?').get(req.params.id)
+    const updated = await prisma.post.update({
+      where: { id },
+      data: { title: title ?? post.title, content: content ?? post.content }
+    })
     res.json(updated)
   } catch (err) {
     next(err)
@@ -58,12 +59,13 @@ router.patch('/:id', authMiddleware, (req, res, next) => {
 })
 
 // 삭제 - DELETE /posts/:id
-router.delete('/:id', authMiddleware, (req, res, next) => {
+router.delete('/:id', authMiddleware, async (req, res, next) => {
   try {
-    const post = db.prepare('SELECT * FROM posts WHERE id = ?').get(req.params.id)
+    const id = parseInt(req.params.id)
+    const post = await prisma.post.findUnique({ where: { id } })
     if (!post) return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' })
 
-    db.prepare('DELETE FROM posts WHERE id = ?').run(req.params.id)
+    await prisma.post.delete({ where: { id } })
     res.json({ message: '삭제되었습니다.' })
   } catch (err) {
     next(err)
