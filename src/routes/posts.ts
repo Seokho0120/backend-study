@@ -4,11 +4,32 @@ import authMiddleware, { AuthRequest } from '../middleware/auth'
 
 const router = Router()
 
-// 목록 조회 - GET /posts
+// 목록 조회 - GET /posts?page=1&limit=10&search=키워드
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const posts = await prisma.post.findMany({ orderBy: { id: 'desc' } })
-    res.json(posts)
+    const page = parseInt(req.query.page as string) || 1
+    const limit = parseInt(req.query.limit as string) || 10
+    const search = req.query.search as string | undefined
+    const skip = (page - 1) * limit
+
+    const where = search
+      ? { OR: [{ title: { contains: search } }, { content: { contains: search } }] }
+      : {}
+
+    const [posts, total] = await Promise.all([
+      prisma.post.findMany({ where, orderBy: { id: 'desc' }, skip, take: limit }),
+      prisma.post.count({ where })
+    ])
+
+    res.json({
+      posts,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    })
   } catch (err) {
     next(err)
   }

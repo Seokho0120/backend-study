@@ -17,7 +17,11 @@
   - [x] Prisma ORM 도입
   - [x] TypeScript + ES Module 전환
   - [ ] Render 배포
-- [ ] 커리큘럼 3 — 기능 확장 (페이지네이션, 검색, 파일 업로드, 이메일, 권한)
+- [ ] 커리큘럼 3 — 기능 확장
+  - [x] 페이지네이션 + 검색
+  - [ ] 파일 업로드
+  - [ ] 이메일 발송
+  - [ ] 권한 처리
 - [ ] 커리큘럼 4 — 심화 (WebSocket, 테스트, Swagger, Redis, 로깅)
 - [ ] 커리큘럼 5 — 인프라 (Docker, CI/CD, AWS)
 
