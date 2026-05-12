@@ -13,6 +13,7 @@ model User {
   password  String
   createdAt DateTime  @default(now()) @map("created_at")
   posts     Post[]
+  comments  Comment[]
 
   @@map("users")
 }
@@ -35,6 +36,8 @@ model Comment {
   createdAt DateTime @default(now()) @map("created_at")
   post      Post     @relation(fields: [postId], references: [id])
   postId    Int      @map("post_id")
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  Int?     @map("author_id")
 
   @@map("comments")
 }

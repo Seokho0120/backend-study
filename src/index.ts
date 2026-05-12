@@ -1,17 +1,21 @@
 import 'dotenv/config'
 import express, { Request, Response, NextFunction } from 'express'
+import path from 'path'
 import authRouter from './routes/auth'
 import postsRouter from './routes/posts'
 import commentsRouter from './routes/comments'
+import uploadRouter from './routes/upload'
 
 const app = express()
 
 app.use(express.json())
 app.use(express.static('public'))
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 
 app.use('/auth', authRouter)
 app.use('/posts', postsRouter)
 app.use('/posts/:id/comments', commentsRouter)
+app.use('/upload', uploadRouter)
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.message)

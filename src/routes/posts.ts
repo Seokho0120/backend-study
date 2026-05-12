@@ -69,6 +69,7 @@ router.patch('/:id', authMiddleware, async (req: AuthRequest, res: Response, nex
 
     const post = await prisma.post.findUnique({ where: { id } })
     if (!post) return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' })
+    if (post.authorId !== req.user!.id) return res.status(403).json({ message: '권한이 없습니다.' })
 
     const updated = await prisma.post.update({
       where: { id },
@@ -86,6 +87,7 @@ router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response, ne
     const id = parseInt(req.params.id as string)
     const post = await prisma.post.findUnique({ where: { id } })
     if (!post) return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' })
+    if (post.authorId !== req.user!.id) return res.status(403).json({ message: '권한이 없습니다.' })
 
     await prisma.post.delete({ where: { id } })
     res.json({ message: '삭제되었습니다.' })
