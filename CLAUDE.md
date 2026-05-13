@@ -23,6 +23,8 @@
   - [x] 이메일 발송
   - [x] 권한 처리
 - [ ] 커리큘럼 4 — 심화 (WebSocket, 테스트, Swagger, Redis, 로깅)
+  - [x] 로깅 (morgan/winston)
+  - [x] Swagger (API 문서화)
 - [ ] 커리큘럼 5 — 인프라 (Docker, CI/CD, AWS)
 
 ## 설명 원칙

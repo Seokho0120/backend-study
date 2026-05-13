@@ -125,7 +125,7 @@ GET /posts?search=키워드
 - `jest`로 API 테스트
 - 테스트 DB 분리
 
-#### 3. API 문서화
+#### 3. API 문서화 ✅ 완료
 - Swagger로 API 명세 자동 생성
 - 협업 시 프론트-백엔드 소통 방법
 
@@ -133,7 +133,7 @@ GET /posts?search=키워드
 - 자주 요청되는 데이터를 미리 저장
 - Redis 기초
 
-#### 5. 로깅
+#### 5. 로깅 ✅ 완료
 - 서버 요청/에러 기록
 - `winston` 또는 `morgan`
 
