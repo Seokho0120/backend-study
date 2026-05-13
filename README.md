@@ -258,3 +258,4 @@ CREATE TABLE comments (
 - [ ] 환경변수 (.env) 적용
 - [ ] 배포 (Render 무료 플랜)
 - [ ] TypeScript + ES Module로 전환
+
