@@ -5,6 +5,7 @@ import authRouter from './routes/auth'
 import postsRouter from './routes/posts'
 import commentsRouter from './routes/comments'
 import uploadRouter from './routes/upload'
+import emailRouter from './routes/email'
 
 const app = express()
 
@@ -16,6 +17,7 @@ app.use('/auth', authRouter)
 app.use('/posts', postsRouter)
 app.use('/posts/:id/comments', commentsRouter)
 app.use('/upload', uploadRouter)
+app.use('/email', emailRouter)
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.message)
