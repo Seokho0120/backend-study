@@ -11,13 +11,13 @@
 자세한 커리큘럼 내용은 `CURRICULUM.md` 참고.
 
 - [x] 커리큘럼 1 완료 — Node.js + Express + SQLite + JWT 인증 + 게시글/댓글 CRUD API
-- [ ] 커리큘럼 2 진행 중 — 실전 전환 (환경변수 → PostgreSQL → Prisma → TypeScript → 배포)
+- [x] 커리큘럼 2 완료 (배포 제외) — 실전 전환
   - [x] 환경변수 (.env / dotenv)
   - [x] PostgreSQL로 DB 전환
   - [x] Prisma ORM 도입
   - [x] TypeScript + ES Module 전환
-  - [ ] Render 배포
-- [ ] 커리큘럼 3 — 기능 확장
+  - [ ] Render 배포 (나중에)
+- [x] 커리큘럼 3 완료 — 기능 확장
   - [x] 페이지네이션 + 검색
   - [x] 파일 업로드
   - [x] 이메일 발송
