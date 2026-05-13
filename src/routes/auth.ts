@@ -6,7 +6,32 @@ import prisma from '../db'
 const router = Router()
 const JWT_SECRET = process.env.JWT_SECRET as string
 
-// 회원가입 - POST /auth/register
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: 회원가입
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 example: "1234"
+ *     responses:
+ *       201:
+ *         description: 회원가입 성공
+ *       409:
+ *         description: 이미 사용 중인 이메일
+ */
 router.post('/register', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body as { email: string; password: string }
@@ -24,7 +49,39 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
   }
 })
 
-// 로그인 - POST /auth/login
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: 로그인
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 example: "1234"
+ *     responses:
+ *       200:
+ *         description: 로그인 성공, JWT 토큰 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: 이메일 또는 비밀번호 불일치
+ */
 router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body as { email: string; password: string }

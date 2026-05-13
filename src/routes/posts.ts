@@ -4,7 +4,32 @@ import authMiddleware, { AuthRequest } from '../middleware/auth'
 
 const router = Router()
 
-// 목록 조회 - GET /posts?page=1&limit=10&search=키워드
+/**
+ * @swagger
+ * /posts:
+ *   get:
+ *     summary: 게시글 목록 조회
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *           example: 키워드
+ *     responses:
+ *       200:
+ *         description: 게시글 목록 및 페이지네이션 정보
+ */
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const page = parseInt(req.query.page as string) || 1
@@ -41,7 +66,24 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   }
 })
 
-// 단건 조회 - GET /posts/:id
+/**
+ * @swagger
+ * /posts/{id}:
+ *   get:
+ *     summary: 게시글 단건 조회
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 게시글 상세
+ *       404:
+ *         description: 게시글 없음
+ */
 router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const post = await prisma.post.findUnique({
@@ -55,7 +97,32 @@ router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
   }
 })
 
-// 작성 - POST /posts
+/**
+ * @swagger
+ * /posts:
+ *   post:
+ *     summary: 게시글 작성
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [title, content]
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: 게시글 작성 성공
+ *       401:
+ *         description: 인증 필요
+ */
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { title, content } = req.body as { title: string; content: string }
@@ -70,7 +137,36 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response, next: N
   }
 })
 
-// 수정 - PATCH /posts/:id
+/**
+ * @swagger
+ * /posts/{id}:
+ *   patch:
+ *     summary: 게시글 수정
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: 수정 성공
+ *       403:
+ *         description: 권한 없음
+ */
 router.patch('/:id', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { title, content } = req.body as { title?: string; content?: string }
@@ -90,7 +186,26 @@ router.patch('/:id', authMiddleware, async (req: AuthRequest, res: Response, nex
   }
 })
 
-// 삭제 - DELETE /posts/:id
+/**
+ * @swagger
+ * /posts/{id}:
+ *   delete:
+ *     summary: 게시글 삭제
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 삭제 성공
+ *       403:
+ *         description: 권한 없음
+ */
 router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const id = parseInt(req.params.id as string)

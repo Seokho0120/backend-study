@@ -2,17 +2,20 @@ import 'dotenv/config'
 import express, { Request, Response, NextFunction } from 'express'
 import path from 'path'
 import morgan from 'morgan'
+import swaggerUi from 'swagger-ui-express'
 import authRouter from './routes/auth'
 import postsRouter from './routes/posts'
 import commentsRouter from './routes/comments'
 import uploadRouter from './routes/upload'
 import emailRouter from './routes/email'
 import logger from './lib/logger'
+import swaggerSpec from './lib/swagger'
 
 const app = express()
 
 app.use(morgan('dev'))
 app.use(express.json())
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 app.use(express.static('public'))
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 

@@ -4,7 +4,22 @@ import authMiddleware, { AuthRequest } from '../middleware/auth'
 
 const router = Router({ mergeParams: true })
 
-// 댓글 목록 - GET /posts/:id/comments
+/**
+ * @swagger
+ * /posts/{id}/comments:
+ *   get:
+ *     summary: 댓글 목록 조회
+ *     tags: [Comments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 댓글 목록
+ */
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const postId = parseInt(req.params.id as string)
@@ -22,7 +37,36 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   }
 })
 
-// 댓글 작성 - POST /posts/:id/comments
+/**
+ * @swagger
+ * /posts/{id}/comments:
+ *   post:
+ *     summary: 댓글 작성
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [content]
+ *             properties:
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: 댓글 작성 성공
+ *       401:
+ *         description: 인증 필요
+ */
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const postId = parseInt(req.params.id as string)
@@ -39,7 +83,31 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response, next: N
   }
 })
 
-// 댓글 삭제 - DELETE /posts/:id/comments/:commentId
+/**
+ * @swagger
+ * /posts/{id}/comments/{commentId}:
+ *   delete:
+ *     summary: 댓글 삭제
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 삭제 성공
+ *       403:
+ *         description: 권한 없음
+ */
 router.delete('/:commentId', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const id = parseInt(req.params.commentId as string)
