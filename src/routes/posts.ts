@@ -17,7 +17,13 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
       : {}
 
     const [posts, total] = await Promise.all([
-      prisma.post.findMany({ where, orderBy: { id: 'desc' }, skip, take: limit }),
+      prisma.post.findMany({
+        where,
+        orderBy: { id: 'desc' },
+        skip,
+        take: limit,
+        include: { author: { select: { email: true } } }
+      }),
       prisma.post.count({ where })
     ])
 
@@ -38,7 +44,10 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
 // 단건 조회 - GET /posts/:id
 router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const post = await prisma.post.findUnique({ where: { id: parseInt(req.params.id as string) } })
+    const post = await prisma.post.findUnique({
+      where: { id: parseInt(req.params.id as string) },
+      include: { author: { select: { email: true } } }
+    })
     if (!post) return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' })
     res.json(post)
   } catch (err) {

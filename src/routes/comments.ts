@@ -11,7 +11,11 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
     const post = await prisma.post.findUnique({ where: { id: postId } })
     if (!post) return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' })
 
-    const comments = await prisma.comment.findMany({ where: { postId }, orderBy: { id: 'asc' } })
+    const comments = await prisma.comment.findMany({
+      where: { postId },
+      orderBy: { id: 'asc' },
+      include: { author: { select: { email: true } } }
+    })
     res.json(comments)
   } catch (err) {
     next(err)
