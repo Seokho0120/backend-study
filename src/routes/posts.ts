@@ -1,6 +1,7 @@
 import { Router, Response, NextFunction } from 'express'
 import prisma from '../db'
 import authMiddleware, { AuthRequest } from '../middleware/auth'
+import redis from '../lib/redis'
 
 const router = Router()
 
@@ -37,6 +38,15 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
     const search = req.query.search as string | undefined
     const skip = (page - 1) * limit
 
+    // 캐시 키: 쿼리 파라미터까지 포함해서 구분
+    const cacheKey = `posts:${page}:${limit}:${search ?? ''}`
+    const cached = await redis.get(cacheKey)
+
+    if (cached) {
+      res.json(JSON.parse(cached))
+      return
+    }
+
     const where = search
       ? { OR: [{ title: { contains: search } }, { content: { contains: search } }] }
       : {}
@@ -52,7 +62,7 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
       prisma.post.count({ where })
     ])
 
-    res.json({
+    const result = {
       posts,
       pagination: {
         total,
@@ -60,7 +70,12 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
         limit,
         totalPages: Math.ceil(total / limit)
       }
-    })
+    }
+
+    // 60초 동안 캐시 유지
+    await redis.set(cacheKey, JSON.stringify(result), 'EX', 60)
+
+    res.json(result)
   } catch (err) {
     next(err)
   }
@@ -131,6 +146,11 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response, next: N
     const post = await prisma.post.create({
       data: { title, content, authorId: req.user!.id }
     })
+
+    // 글이 추가됐으니 목록 캐시 전체 삭제
+    const keys = await redis.keys('posts:*')
+    if (keys.length > 0) await redis.del(...keys)
+
     res.status(201).json(post)
   } catch (err) {
     next(err)
@@ -180,6 +200,10 @@ router.patch('/:id', authMiddleware, async (req: AuthRequest, res: Response, nex
       where: { id },
       data: { title: title ?? post.title, content: content ?? post.content }
     })
+
+    const keys = await redis.keys('posts:*')
+    if (keys.length > 0) await redis.del(...keys)
+
     res.json(updated)
   } catch (err) {
     next(err)
@@ -214,6 +238,10 @@ router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response, ne
     if (post.authorId !== req.user!.id) return res.status(403).json({ message: '권한이 없습니다.' })
 
     await prisma.post.delete({ where: { id } })
+
+    const keys = await redis.keys('posts:*')
+    if (keys.length > 0) await redis.del(...keys)
+
     res.json({ message: '삭제되었습니다.' })
   } catch (err) {
     next(err)
