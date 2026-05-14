@@ -147,11 +147,11 @@ GET /posts?search=키워드
 
 ### 학습 항목
 
-#### 1. Docker
+#### 1. Docker ✅ 완료
 - 개발 환경을 컨테이너로 묶기
 - `docker-compose`로 서버 + DB 한 번에 실행
 
-#### 2. CI/CD (GitHub Actions)
+#### 2. CI/CD (GitHub Actions) ✅ 완료
 - 코드 push 시 자동 테스트 + 배포
 - 배포 자동화
 
@@ -183,4 +183,7 @@ GET /posts?search=키워드
 - [x] 커리큘럼 2 완료 (배포 제외)
 - [x] 커리큘럼 3 완료
 - [x] 커리큘럼 4 완료 (배포 제외)
-- [ ] 커리큘럼 5
+- [ ] 커리큘럼 5 (진행 중)
+  - [x] Docker
+  - [x] CI/CD (GitHub Actions)
+  - [ ] 클라우드 (AWS)
