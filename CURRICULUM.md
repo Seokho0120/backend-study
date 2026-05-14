@@ -28,23 +28,23 @@
 
 ---
 
-## 커리큘럼 2 — 실전 전환
+## 커리큘럼 2 — 실전 전환 ✅ 완료 (배포 제외)
 
 **목표:** 실제 서비스에서 쓰는 구조로 전환
 
 ### 학습 항목
 
-#### 1. 환경변수 (.env)
+#### 1. 환경변수 (.env) ✅ 완료
 - JWT_SECRET, DB 연결정보 등 민감한 값을 코드에서 분리
 - `dotenv` 라이브러리 사용
 - `.gitignore`에 `.env` 추가하는 이유
 
-#### 2. PostgreSQL로 DB 전환
+#### 2. PostgreSQL로 DB 전환 ✅ 완료
 - SQLite vs PostgreSQL 차이 (파일 vs 서버형 DB)
 - 왜 실제 서비스에선 PostgreSQL을 쓰는지
 - 로컬에 PostgreSQL 설치 및 연결
 
-#### 3. Prisma (ORM) 도입
+#### 3. Prisma (ORM) 도입 ✅ 완료
 - ORM이 뭔지 — SQL 직접 안 쓰고 JS로 DB 조작
 - Prisma 스키마 정의
 - 마이그레이션 개념 (DB 구조 변경 이력 관리)
@@ -58,7 +58,7 @@ db.prepare('SELECT * FROM posts WHERE id = ?').get(id)
 prisma.post.findUnique({ where: { id } })
 ```
 
-#### 4. TypeScript + ES Module 전환
+#### 4. TypeScript + ES Module 전환 ✅ 완료
 - `require/module.exports` → `import/export`
 - TypeScript로 타입 안정성 확보
 - req.body 타입 정의
@@ -70,13 +70,13 @@ prisma.post.findUnique({ where: { id } })
 
 ---
 
-## 커리큘럼 3 — 기능 확장
+## 커리큘럼 3 — 기능 확장 ✅ 완료
 
 **목표:** 실제 서비스에 필요한 기능들 구현
 
 ### 학습 항목
 
-#### 1. 페이지네이션
+#### 1. 페이지네이션 ✅ 완료
 - 게시글 10개씩 나눠서 가져오기
 - `page`, `limit` 쿼리 파라미터
 - `req.query` 사용법
@@ -85,7 +85,7 @@ prisma.post.findUnique({ where: { id } })
 GET /posts?page=1&limit=10
 ```
 
-#### 2. 검색
+#### 2. 검색 ✅ 완료
 - 제목/내용으로 게시글 검색
 - SQL `LIKE` 또는 Prisma `contains`
 
@@ -93,34 +93,34 @@ GET /posts?page=1&limit=10
 GET /posts?search=키워드
 ```
 
-#### 3. 파일 업로드
+#### 3. 파일 업로드 ✅ 완료
 - 이미지 업로드 (`multer` 라이브러리)
 - 파일을 서버에 저장하는 방법
 - 클라우드 스토리지 연동 (AWS S3 또는 Cloudinary)
 
-#### 4. 이메일 발송
+#### 4. 이메일 발송 ✅ 완료
 - 회원가입 인증 메일
 - `nodemailer` 또는 외부 서비스 (SendGrid, Resend)
 
-#### 5. 권한 처리
+#### 5. 권한 처리 ✅ 완료
 - 자기 글만 수정/삭제 가능하게
 - `post.user_id === req.user.id` 검증
 - posts 테이블에 user_id 컬럼 추가
 
 ---
 
-## 커리큘럼 4 — 심화
+## 커리큘럼 4 — 심화 ✅ 완료
 
 **목표:** 서비스 품질 높이기
 
 ### 학습 항목
 
-#### 1. 실시간 통신 (WebSocket)
+#### 1. 실시간 통신 (WebSocket) ✅ 완료
 - HTTP vs WebSocket 차이
 - `socket.io`로 실시간 채팅 구현
 - 실시간 알림
 
-#### 2. 테스트 코드
+#### 2. 테스트 코드 ✅ 완료
 - 왜 테스트를 작성하는지
 - `jest`로 API 테스트
 - 테스트 DB 분리
@@ -129,7 +129,7 @@ GET /posts?search=키워드
 - Swagger로 API 명세 자동 생성
 - 협업 시 프론트-백엔드 소통 방법
 
-#### 4. 캐싱
+#### 4. 캐싱 ✅ 완료
 - 자주 요청되는 데이터를 미리 저장
 - Redis 기초
 
