@@ -1,0 +1,69 @@
+name: CI
+
+# 언제 실행할지
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # GitHub이 제공하는 Ubuntu 서버에서 실행
+
+    # 테스트용 PostgreSQL DB (docker-compose 없이 GitHub Actions가 직접 실행)
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: backend_study_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # 1. 코드 받아오기
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      # 2. Node.js 설치
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'  # node_modules 캐싱 (빌드 속도 향상)
+
+      # 3. 패키지 설치
+      - name: 패키지 설치
+        run: npm ci
+
+      # 4. Prisma 클라이언트 생성
+      - name: Prisma 클라이언트 생성
+        run: npx prisma generate
+
+      # 5. 테스트용 .env.test 생성
+      - name: 테스트 환경변수 설정
+        run: |
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/backend_study_test" > .env.test
+          echo "JWT_SECRET=test-secret" >> .env.test
+          echo "NODE_ENV=test" >> .env.test
+
+      # 6. DB 마이그레이션
+      - name: DB 마이그레이션
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/backend_study_test
+
+      # 7. 테스트 실행
+      - name: 테스트 실행
+        run: npm test
+
+      # 8. TypeScript 빌드 확인
+      - name: 빌드 확인
+        run: npm run build
