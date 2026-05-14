@@ -1,5 +1,6 @@
 import { config } from 'dotenv'
 import prisma from '../db'
+import redis from '../lib/redis'
 
 config({ path: '.env.test' })
 
@@ -11,4 +12,5 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await prisma.$disconnect()
+  await redis.quit()
 })
