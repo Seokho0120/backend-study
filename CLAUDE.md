@@ -28,7 +28,13 @@
   - [x] 테스트 코드 (Jest + Supertest)
   - [x] 캐싱 (Redis)
   - [x] 실시간 통신 (WebSocket + socket.io)
-- [ ] 커리큘럼 5 — 인프라 (Docker, CI/CD, AWS)
+- [x] 커리큘럼 5 완료 (AWS 제외) — 인프라
+  - [x] Docker
+  - [x] CI/CD (GitHub Actions)
+  - [ ] AWS (EC2/RDS/S3) — 계정 문제로 보류, 나중에 CI/CD와 묶어서 진행
+- [ ] 커리큘럼 6 — 풀스택 프로젝트
+  - [ ] Next.js — todo-app (로그인 + 할일 CRUD) → /Users/seokori/Desktop/personal/todo-app
+  - [ ] NestJS — 백엔드 구조화 심화
 
 ## 설명 원칙
 
